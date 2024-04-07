@@ -1,0 +1,16 @@
+.container{
+  height: 100vh; 
+  display: flex; /* Flexbox kullanarak bileşenleri yatay hizalama */
+  flex-direction: column; /* Bileşenleri dikey olarak hizala */
+}
+
+.main{
+  height: 50%;
+  background-color: aqua;
+  margin-top: 0;
+}
+
+.footer{
+  height: 25%;
+  background-color: brown;
+}
