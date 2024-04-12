@@ -7,7 +7,9 @@ const Search = (props)=>{
 
     const Searcher = async (event)=>{
         //setSearch(event.target.value); // Bir hamle geriden geliyor, bunu araştır.
+        //setSearch(document.getElementById('search').value); //Bir hamle geriden geliyor, bunu araştır.
         let dataSearch = event.target.value; // Anlık geliyor.
+        
         try {
             const response = await fetch('http://localhost:5051/api/Toplanti/Search',{
             method:'POST',
@@ -25,7 +27,7 @@ const Search = (props)=>{
     return(
 
         <>
-            <input type="text" placeholder="İsme Göre Ara" onChange={Searcher} />
+            <input type="text" placeholder="İsme Göre Ara" onChange={Searcher} id="search" />
             <p>Katilimci Adi:{ data[0].katilimcilar} </p>
         </>
 
