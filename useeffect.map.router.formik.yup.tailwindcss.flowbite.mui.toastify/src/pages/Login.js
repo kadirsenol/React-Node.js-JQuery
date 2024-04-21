@@ -1,9 +1,12 @@
-import { Button, TextField } from "@mui/material";
+import { Button, InputAdornment, TextField } from "@mui/material";
+import { Email, Visibility, VisibilityOff } from "@mui/icons-material";
 import { Formik,  } from "formik";
 import * as Yup from 'yup'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import image2 from '../assest/image/depositphotos_575860964-stock-photo-iot-theme-hand-pressing-button.jpg'
+import { useState } from "react";
 
 
 const registerLoginSchema = Yup.object().shape({
@@ -15,6 +18,8 @@ const registerLoginSchema = Yup.object().shape({
 const Login = () => {
 
   const navigate = useNavigate();
+
+  const [showPassword,setShowPassword] = useState(true);
 
   const LoginSend = async (values) => {
     try {
@@ -37,41 +42,55 @@ const Login = () => {
       validationSchema={registerLoginSchema}
     >
       {({values,handleChange,handleSubmit,handleBlur,touched,errors}) => (
-        <div className="flex justify-center min-h-screen items-center">
-          <div className="w-1/4">
-            <div>
+        <div className="flex justify-center min-h-screen items-center" style={{backgroundImage:`url(${image2})`,backgroundPosition:'center', backgroundRepeat:'no-repeat'}}>
+          <div className="w-1/4 bg-white bg-opacity-70 rounded-xl">
+            <div className="flex justify-center">
               <TextField
                 variant="standard"
                 id="Email"
                 label="Email"
-                className="w-full"
+                className="w-5/6"
                 onChange={handleChange("Email")}
                 value={values.Email}
                 onBlur={handleBlur('Email')}
                 error={touched.Email && Boolean(errors.Email)}
                 helperText={touched.Email && errors.Email}
+                InputProps={{
+                  endAdornment:(
+                    <InputAdornment>
+                      <Email className="cursor-default"/>
+                    </InputAdornment>
+                  )
+                }}
               />
             </div>
-            <div className="mb-3">
+            <div className="mb-3 flex justify-center">
               <TextField
                 variant="standard"
                 id="Password"
                 label="Password"
-                type="password"
-                className="w-full "
+                type={showPassword ? 'password' : 'text'}
+                className="w-5/6"
                 onChange={handleChange("Password")}
                 value={values.Password}
                 onBlur={handleBlur('Password')}
                 error={touched.Password && Boolean(errors.Password)}
                 helperText={touched.Password && errors.Password}
+                InputProps={{
+                  endAdornment:(
+                    <InputAdornment onClick={()=>{setShowPassword(!showPassword)}}>
+                      {showPassword ? <Visibility className="cursor-pointer" />:<VisibilityOff className="cursor-pointer" />}
+                    </InputAdornment>
+                  )
+                }}
               />
             </div>
-            <div className=" flex justify-center gap-10 ">
-              <Button variant="contained" size="small" onClick={handleSubmit}>
+            <div className=" flex justify-center gap-10 mb-3 ">
+              <Button variant="standard" size="small" onClick={handleSubmit}>
                 Login
               </Button>
-              <Button href="/Register" variant="contained" size="small">
-                Register
+              <Button href="/Register" variant="standard" size="small">
+               Go Register
               </Button>
             </div>
           </div>
