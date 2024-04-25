@@ -5,8 +5,9 @@ import * as Yup from 'yup'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
-import image2 from '../assest/image/depositphotos_575860964-stock-photo-iot-theme-hand-pressing-button.jpg'
-import { useState } from "react";
+import image2 from '../assest/image/imglogin.jpg'
+import {useState } from "react";
+import navbaricon from '../assest/image/iotnavbar.png'
 
 
 const registerLoginSchema = Yup.object().shape({
@@ -21,16 +22,39 @@ const Login = () => {
 
   const [showPassword,setShowPassword] = useState(true);
 
+  //BURAYA LOGIN OLUNMUS ISE LOGIN SAYFASINA GELINDIGINDE DIREK HOME YONLENDIREN BIR useEffect ıcınde chackToken yaz.
+
   const LoginSend = async (values) => {
     try {
       const response = await axios.post("http://localhost:5051/api/Account/Login", values);
-      if(response.status===200){
+      if(response.status===200){        
+        localStorage.setItem("token",response.data.accessToken);          
+        navigate('/Profile')
         toast.success(response.data.message)
-        const token = response.data.accessToken;     
-        navigate('/Profile',{state:{token}})
+      }
+      else{
+        toast.info('Beklenmedik bir durum meydana geldi, bilgilerinizi kontrol ederek lutfen tekrar deneyin.')
       }
     } catch (error) {
-      toast.error(error.response.data.detail);
+      console.log(error)
+      if(error.code==="ERR_NETWORK"){
+        toast.error("Sunucuya bağlanılamadı. !")  
+       }
+      else if (error.response.status === 500) {
+        //Problem(), server side bissunes exceptions and all catch error
+        toast.error(error.response.data.detail);
+      }
+      else if (error.response.status === 400) {
+        //BadRequest(), server side valid. Eger frontend validinden bir sekil kurtulursa back validi devreye girecek
+          Object.values(error.response.data.errors).forEach((value)=>{
+            value.forEach((message)=>{
+              toast.error(message)
+            })
+          })
+      }
+      else{
+        toast.error('Opps! Beklenmedik bir hata meydana geldi.')
+      }
     }
 
   };
@@ -42,7 +66,12 @@ const Login = () => {
       validationSchema={registerLoginSchema}
     >
       {({values,handleChange,handleSubmit,handleBlur,touched,errors}) => (
-        <div className="flex justify-center min-h-screen items-center" style={{backgroundImage:`url(${image2})`,backgroundPosition:'center', backgroundRepeat:'no-repeat'}}>
+        <div className="flex justify-center min-h-screen items-center relative " style={{backgroundImage:`url(${image2})`, backgroundSize:'cover', backgroundPosition:'center', backgroundRepeat:'no-repeat'}}>
+           <img onClick={()=>{navigate("/")}} 
+           className="absolute w-10 h-10 top-3 left-5 cursor-pointer hover:bg-zinc-500 rounded-xl" 
+           src={navbaricon} 
+           alt="ioticon"
+           />
           <div className="w-1/4 bg-white bg-opacity-70 rounded-xl">
             <div className="flex justify-center">
               <TextField
@@ -89,7 +118,7 @@ const Login = () => {
               <Button variant="standard" size="small" onClick={handleSubmit}>
                 Login
               </Button>
-              <Button href="/Register" variant="standard" size="small">
+              <Button onClick={()=>(navigate("/Register"))} variant="standard" size="small">
                Go Register
               </Button>
             </div>
