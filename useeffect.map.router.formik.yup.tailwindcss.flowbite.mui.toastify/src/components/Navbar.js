@@ -1,10 +1,13 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import navbariot from '../assest/image/iotnavbar.png'
-import { ShoppingCartCheckout } from '@mui/icons-material'
+import { Login, PersonAdd, ShoppingCartCheckout } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import user from '../assest/image/user2.png'
+import { useSelector } from 'react-redux'
+import { jwtDecode } from 'jwt-decode'
+import { Button } from '@mui/material'
 
 
 
@@ -21,9 +24,32 @@ function classNames(...classes) {
 
 export default function Navbar() {
 
+  const [isLogin, setIsLogin] = useState(false)
+
+  useEffect(()=>{
+  chackToken();
+  },[isLogin])
+
+  const chackToken = ()=>{
+    const token = localStorage.getItem("token")
+    if(token){
+      const deCodeJwt = jwtDecode(token)
+      const expToken = deCodeJwt.exp
+      let date = new Date();
+      const currentDate = date.getTime() / 1000
+      console.log(currentDate, expToken)
+
+      if(expToken >= currentDate ){
+        console.log(currentDate, expToken)
+        setIsLogin(true)
+      }
+  }
+}
+
   const navigate = useNavigate()
+  const products = useSelector((state)=>state.cart.products)
   
-  return (
+  return ( 
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
         <>
@@ -70,6 +96,7 @@ export default function Navbar() {
                   </div>
                 </div>
               </div>
+              {isLogin ? 
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                 <button
                   type="button"
@@ -78,17 +105,19 @@ export default function Navbar() {
                 >
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">View notifications</span>
-                  <ShoppingCartCheckout className="h-6 w-6" aria-hidden="true" />
+                  <div className='relative'>
+                    {products.length!==0 ? <div className=' w-4 h-4 text-xs text-white absolute -top-3 -right-1 bg-red-500 rounded-full'> {products.length} </div> : null }
+                     <ShoppingCartCheckout className="h-6 w-6" aria-hidden="true" />
+                     </div>
                 </button>
 
-                {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3 hover:bg-slate-500 rounded-xl">
                   <div>
                     <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                       <span className="absolute -inset-1.5" />
                       <span className="sr-only">Open user menu</span>
                       <img
-                        className="h-8 w-8 rounded-full" 
+                        className="h-10 w-10 rounded-full" 
                         src={user}
                         alt=""
                       />
@@ -131,7 +160,7 @@ export default function Navbar() {
                             onClick={()=>{navigate("/Card")}}                            
                             className={classNames(active ? 'bg-gray-100 w-full text-left' : '', 'block px-4 py-2 text-sm text-gray-700 w-full text-left')}
                           >
-                            Your Card
+                            Your Cart
                           </button>
                         )}
                       </Menu.Item>
@@ -150,8 +179,17 @@ export default function Navbar() {
                     </Menu.Items>
                   </Transition>
                 </Menu>
+              </div> :
+              <div className='flex justify-end'>
+              <div>
+                <Button startIcon={<Login/>} color='success' variant='contained' onClick={()=>navigate("/Login")} >Login</Button>
               </div>
-            </div>
+              <div className='ms-2'>
+                <Button endIcon={<PersonAdd/>} color='primary' variant='outlined' onClick={()=>navigate("/Register")}>Register</Button>
+              </div>
+              </div>
+                }       
+            </div>                      
           </div>
 
           <Disclosure.Panel className="sm:hidden">
